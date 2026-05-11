@@ -31,7 +31,8 @@ Proper permissions are required for the application to interact with storage and
 Setting up the pipeline to handle unstructured data (PDFs).
 
 * **Cloud Storage (GCS):** Create a bucket to store the source documents.
-* **Document AI:** * Configure a processor for OCR.
+* **Document AI:**
+    * Configure a processor for OCR.
     * This component handles the conversion of PDF data into structured text/JSON for embedding.
 * **Discovery Engine (Vertex AI Search):**
     * *Note:* Scheduled for future use. This will serve as the managed search/retrieval engine.
