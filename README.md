@@ -52,3 +52,5 @@ Transitioning the RAG application logic from local development to production.
 
 ---
 **Team Note:** Use either the Google Cloud Console UI for manual configuration or the `gcloud` CLI for automated setups as per your workflow preference.
+
+https://github.com/d-hackmt/enterprise_rag-with-GCP
