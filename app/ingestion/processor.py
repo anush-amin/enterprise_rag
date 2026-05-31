@@ -22,16 +22,46 @@ from app.ingestion.chunking.splitter import chunk_text
 logfire.configure(service_name="enterprise-ingestion-service")
 
 # Initialize Vertex AI for Embeddings
-vertexai.init(project=settings.PROJECT_ID, location=settings.LOCATION)
+try:
+    vertexai.init(project=settings.PROJECT_ID, location=settings.LOCATION)
+    logfire.info("✅ Vertex AI initialized successfully")
+except Exception as e:
+    logfire.error(
+        "❌ Failed to initialize Vertex AI",
+        exception=str(e),
+        error_type=type(e).__name__,
+        project_id=settings.PROJECT_ID
+    )
+    raise
 
 # Initialize GCS Client
-storage_client = storage.Client(project=settings.PROJECT_ID)
+try:
+    storage_client = storage.Client(project=settings.PROJECT_ID)
+    logfire.info("✅ GCS Client initialized successfully")
+except Exception as e:
+    logfire.error(
+        "❌ Failed to initialize GCS Client",
+        exception=str(e),
+        error_type=type(e).__name__,
+        project_id=settings.PROJECT_ID
+    )
+    raise
 
 # Initialize Qdrant Client
-qdrant_client = QdrantClient(
-    url=settings.QDRANT_URL,
-    api_key=settings.QDRANT_API_KEY
-)
+try:
+    qdrant_client = QdrantClient(
+        url=settings.QDRANT_URL,
+        api_key=settings.QDRANT_API_KEY
+    )
+    logfire.info("✅ Qdrant Client initialized successfully")
+except Exception as e:
+    logfire.error(
+        "❌ Failed to initialize Qdrant Client",
+        exception=str(e),
+        error_type=type(e).__name__,
+        qdrant_url=settings.QDRANT_URL
+    )
+    raise
 
 from fastapi import FastAPI, Request, BackgroundTasks
 import tempfile
@@ -130,7 +160,15 @@ def process_file(file_path: str, filename: str, source_type: str, skip_raw_uploa
                 logfire.info(f"✨ Indexed {len(points)} points to Qdrant")
 
         except Exception as e:
-            logfire.error(f"💥 Failed to process {filename}: {e}")
+            logfire.error(
+                f"💥 Failed to process {filename}",
+                filename=filename,
+                source_type=source_type,
+                file_path=file_path,
+                exception=str(e),
+                error_type=type(e).__name__,
+                traceback=True
+            )
 
 @app.post("/")
 async def eventarc_webhook(request: Request, background_tasks: BackgroundTasks):
